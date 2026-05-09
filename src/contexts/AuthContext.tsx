@@ -49,14 +49,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Перевіряємо чи є активна сесія при завантаженні сторінки
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id)
-      }
-      setLoading(false)
-    })
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setUser(session?.user ?? null)
+        if (session?.user) fetchProfile(session.user.id)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
 
     // Підписуємось на зміни стану авторизації (вхід/вихід)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

@@ -113,12 +113,20 @@ export default function RegisterPage() {
             Ми надіслали лист підтвердження на <span className="text-white/70">{email}</span>.
             Перевірте пошту і підтвердьте акаунт.
           </p>
-          <Link
-            to="/login"
-            className="inline-block bg-white text-black px-8 py-3 text-sm font-medium hover:bg-white/90 transition-colors"
-          >
-            Перейти до входу
-          </Link>
+          <div className="flex flex-col gap-3 items-center">
+            <Link
+              to="/login"
+              className="inline-block bg-white text-black px-8 py-3 text-sm font-medium hover:bg-white/90 transition-colors"
+            >
+              Перейти до входу
+            </Link>
+            <Link
+              to="/"
+              className="text-white/30 hover:text-white/60 text-xs transition-colors"
+            >
+              На головну →
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -189,7 +197,7 @@ export default function RegisterPage() {
           {/* Ім'я */}
           <div>
             <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
-              Повне ім'я
+              Повне ім'я <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -197,6 +205,7 @@ export default function RegisterPage() {
               onChange={e => setFullName(e.target.value)}
               placeholder="Іван Петренко"
               required
+              minLength={2}
               className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 text-sm outline-none focus:border-white/40 transition-colors placeholder:text-white/20"
             />
           </div>
@@ -204,7 +213,7 @@ export default function RegisterPage() {
           {/* Email */}
           <div>
             <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
-              Email
+              Email <span className="text-red-400">*</span>
             </label>
             <input
               type="email"
@@ -219,7 +228,7 @@ export default function RegisterPage() {
           {/* Пароль */}
           <div>
             <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
-              Пароль
+              Пароль <span className="text-red-400">*</span>
             </label>
             <div className="relative">
               <input
@@ -262,7 +271,7 @@ export default function RegisterPage() {
           {/* Підтвердження пароля */}
           <div>
             <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
-              Підтвердіть пароль
+              Підтвердіть пароль <span className="text-red-400">*</span>
             </label>
             <div className="relative">
               <input
@@ -320,7 +329,7 @@ export default function RegisterPage() {
           {/* Кнопка реєстрації */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !fullName.trim() || !email.trim() || !password || !confirmPassword || !agreedToTerms}
             className="w-full bg-white text-black py-3 text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Створення акаунту...' : 'Зареєструватись'}
