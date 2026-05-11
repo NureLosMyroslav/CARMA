@@ -56,6 +56,7 @@ const ZONE_FRACTIONS: Record<string, {
   transmission: { length: 0.50, height: 0.20, width: 0.50, radius: 0.09 },
   suspension:   { length: 0.15, height: 0.30, width: 0.50, radius: 0.10 },
   brakes:       { length: 0.85, height: 0.22, width: 0.50, radius: 0.07 },
+  electrical:   { length: 0.65, height: 0.55, width: 0.50, radius: 0.08 },
 }
 
 const CAR_MODEL_URL =

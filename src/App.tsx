@@ -8,6 +8,8 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import HomePage from '@/pages/HomePage'
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
+import DiagnosticsPage from '@/pages/DiagnosticsPage'
+import DiagnosticsResultPage from '@/pages/DiagnosticsResultPage'
 
 // Створюємо клієнт для кешування запитів до Supabase
 const queryClient = new QueryClient()
@@ -24,6 +26,8 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/diagnostics" element={<DiagnosticsPage />} />
+            <Route path="/diagnostics/result" element={<DiagnosticsResultPage />} />
 
             {/* TODO: захищені сторінки (тільки для авторизованих) */}
             {/* <Route path="/garage" element={<ProtectedRoute><GaragePage /></ProtectedRoute>} /> */}

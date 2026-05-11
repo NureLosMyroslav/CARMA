@@ -54,7 +54,7 @@ export default function LoginPage() {
       if (profileData?.role === 'admin') {
         navigate('/admin')
       } else {
-        navigate('/garage')
+        navigate('/')
       }
     }
 
