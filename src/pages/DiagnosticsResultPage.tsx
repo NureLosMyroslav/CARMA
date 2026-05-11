@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, AlertTriangle, Info, Zap, RefreshCw } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
-import CarVisualizer from '@/components/diagnostics/CarVisualizer'
+import CarDiagnosticViewer from '@/components/car/CarDiagnosticViewer'
+import type { CarZone } from '@/components/car/CarDiagnosticViewer'
 import { analyzeCar } from '@/lib/gemini'
 import type { CarInfo, CarIssue, DiagnosticsResult, IssueSeverity, CarSystem } from '@/lib/gemini'
 
@@ -14,6 +15,65 @@ const SYSTEM_LABELS: Record<CarSystem, string> = {
   electrical: 'Електрика',
   exhaust_cooling: 'Охолодження / Вихлоп',
   body: 'Кузов',
+}
+
+// Map gemini CarSystem → CarDiagnosticViewer zone id
+const SYSTEM_TO_ZONE_ID: Partial<Record<CarSystem, string>> = {
+  engine:          'engine',
+  transmission:    'transmission',
+  brakes:          'brakes',
+  suspension:      'suspension',
+  electrical:      'electrical',
+  exhaust_cooling: 'cooling',
+}
+
+function issuesToZones(issues: CarIssue[]): CarZone[] {
+  const severityRank: Record<IssueSeverity, number> = { critical: 3, warning: 2, info: 1 }
+
+  const byZone: Record<string, { severity: IssueSeverity; issue: CarIssue }> = {}
+
+  for (const issue of issues) {
+    const zoneId = SYSTEM_TO_ZONE_ID[issue.system]
+    if (!zoneId) continue
+    const current = byZone[zoneId]
+    if (!current || severityRank[issue.severity] > severityRank[current.severity]) {
+      byZone[zoneId] = { severity: issue.severity, issue }
+    }
+  }
+
+  const severityMap: Record<IssueSeverity, CarZone['severity']> = {
+    critical: 'critical',
+    warning:  'warning',
+    info:     'attention',
+  }
+
+  const allZoneIds = ['engine', 'transmission', 'brakes', 'suspension', 'electrical', 'cooling']
+
+  return allZoneIds.map(zoneId => {
+    const entry = byZone[zoneId]
+    const labelMap: Record<string, string> = {
+      engine:       'Двигун',
+      transmission: 'Трансмісія',
+      brakes:       'Гальма',
+      suspension:   'Підвіска',
+      electrical:   'Електрика',
+      cooling:      'Охолодження',
+    }
+    if (entry) {
+      return {
+        id:          zoneId,
+        label:       labelMap[zoneId],
+        severity:    severityMap[entry.severity],
+        description: `${entry.issue.title}. ${entry.issue.description}`,
+      }
+    }
+    return {
+      id:          zoneId,
+      label:       labelMap[zoneId],
+      severity:    'ok' as const,
+      description: 'Проблем не виявлено',
+    }
+  })
 }
 
 const SEVERITY_CONFIG: Record<
@@ -216,6 +276,8 @@ export default function DiagnosticsResultPage() {
     : result.overall_score >= 60 ? 'Задовільний стан'
     : 'Потребує уваги'
 
+  const zones = issuesToZones(result.issues)
+
   return (
     <div className="bg-black min-h-screen text-white">
       <Navbar />
@@ -264,12 +326,9 @@ export default function DiagnosticsResultPage() {
           </div>
         </div>
 
-        {/* Car Visualizer */}
-        <div className="border border-white/10 p-6 mb-10 bg-white/[0.02]">
-          <p className="text-white/30 text-xs tracking-[0.3em] uppercase mb-6">
-            Візуалізація проблем
-          </p>
-          <CarVisualizer issues={result.issues} />
+        {/* 3D Car Visualizer */}
+        <div className="h-[420px] mb-10">
+          <CarDiagnosticViewer zones={zones} />
         </div>
 
         {/* Issues list */}
