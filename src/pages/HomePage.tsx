@@ -4,6 +4,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, Shield, Bot, Car, BarChart3, Bell, ShoppingCart } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
+import CarDiagnosticViewer from '@/components/car/CarDiagnosticViewer'
 
 // Список функцій платформи для секції "Можливості"
 // Кожен об'єкт містить іконку з lucide-react, заголовок і опис
@@ -62,13 +63,6 @@ const aiFeatureList = [
   'Попередження',
   'Профілактичні рекомендації',
   'AI-чат з автоекспертом',
-]
-
-// Демо-дані для картки Car Health Score в AI-секції
-const healthScoreDemo = [
-  { label: 'Двигун', val: 92, color: 'bg-green-400' },
-  { label: 'Гальма', val: 78, color: 'bg-yellow-400' },
-  { label: 'Підвіска', val: 85, color: 'bg-green-400' },
 ]
 
 export default function HomePage() {
@@ -167,25 +161,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* === AI СЕКЦІЯ === */}
-      {/* Пояснення як працює AI-діагностика + демо картка */}
       <section className="py-24 bg-white/5">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto px-6">
 
-          {/* Текстова частина зліва */}
-          <div>
+          <div className="mb-12">
             <p className="text-white/40 text-xs tracking-[0.3em] uppercase mb-4">Штучний інтелект</p>
             <h2 className="text-3xl md:text-4xl font-light mb-6">
               AI-помічник, який знає ваше авто
             </h2>
-            <p className="text-white/50 leading-relaxed mb-8">
+            <p className="text-white/50 leading-relaxed max-w-xl mb-8">
               Інтеграція з Google Gemini 2.0 Flash аналізує технічний стан вашого автомобіля,
               враховуючи модель, рік випуску та пробіг. Отримуйте персоналізовані рекомендації
               та індекс Car Health Score.
             </p>
-
-            {/* Список переваг */}
-            <ul className="space-y-3 mb-10">
+            <ul className="flex flex-wrap gap-x-8 gap-y-2 mb-10">
               {aiFeatureList.map(item => (
                 <li key={item} className="flex items-center gap-3 text-sm text-white/70">
                   <div className="w-1 h-1 bg-white rounded-full" />
@@ -193,7 +182,6 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-
             <Link
               to="/register"
               className="inline-flex items-center gap-2 text-sm text-white border-b border-white/30 pb-0.5 hover:border-white transition-colors duration-200"
@@ -202,37 +190,8 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Демо-картка Car Health Score справа */}
-          <div className="bg-black border border-white/10 p-8 space-y-4">
-            <div className="flex items-center gap-3 mb-6">
-              {/* Пульсуюча точка - імітація "живого" показника */}
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-white/50 text-xs tracking-widest uppercase">Car Health Score</span>
-            </div>
-
-            {/* Велике число - загальний бал */}
-            <div className="text-7xl font-light text-center py-8">
-              87<span className="text-3xl text-white/30">/100</span>
-            </div>
-
-            {/* Прогрес-бари для кожної системи авто */}
-            <div className="space-y-3">
-              {healthScoreDemo.map(item => (
-                <div key={item.label}>
-                  <div className="flex justify-between text-xs text-white/40 mb-1">
-                    <span>{item.label}</span>
-                    <span>{item.val}%</span>
-                  </div>
-                  {/* Тонка лінія прогресу */}
-                  <div className="h-px bg-white/10">
-                    <div
-                      className={`h-px ${item.color}`}
-                      style={{ width: `${item.val}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div style={{ height: '480px' }}>
+            <CarDiagnosticViewer />
           </div>
         </div>
       </section>
