@@ -8,10 +8,12 @@ import { fetchListingById, toggleFavorite, fetchUserFavorites, getPhotoUrl } fro
 import type { ListingWithPhoto, CarPhoto } from '@/lib/marketplace'
 import { useAuth } from '@/contexts/AuthContext'
 
+// Тип для сторінки деталей - оголошення з усіма фото
 type FullListing = ListingWithPhoto & { allPhotos: CarPhoto[] }
 
-// ─── Lightbox ─────────────────────────────────────────────────────────────────
+// ─── Lightbox (повноекранний перегляд фото з зумом) ──────────────────────────
 
+// Межі зуму: від 1x до 4x
 const MIN_ZOOM = 1
 const MAX_ZOOM = 4
 
@@ -21,13 +23,17 @@ function Lightbox({ urls, startIdx, onClose }: {
   onClose: () => void
 }) {
   const [idx, setIdx] = useState(startIdx)
+
+  // Стан зуму і зміщення для панорамування
   const [zoom, setZoom] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
+
+  // Зберігаємо початкову точку drag щоб рахувати зміщення
   const dragStart = useRef<{ mx: number; my: number; ox: number; oy: number } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Reset zoom/pan when photo changes
+  // При зміні фото скидаємо зум і позицію
   useEffect(() => {
     setZoom(1)
     setOffset({ x: 0, y: 0 })
@@ -38,11 +44,13 @@ function Lightbox({ urls, startIdx, onClose }: {
     setOffset({ x: 0, y: 0 })
   }
 
+  // Перехід до попереднього фото (тільки якщо не в режимі зуму)
   const prev = useCallback(() => {
-    if (zoom > 1) return // don't navigate when zoomed
+    if (zoom > 1) return
     setIdx(i => (i - 1 + urls.length) % urls.length)
   }, [urls.length, zoom])
 
+  // Перехід до наступного фото (тільки якщо не в режимі зуму)
   const next = useCallback(() => {
     if (zoom > 1) return
     setIdx(i => (i + 1) % urls.length)
@@ -60,19 +68,20 @@ function Lightbox({ urls, startIdx, onClose }: {
     }
   }, [])
 
-  // Scroll to zoom
+  // Зум колесом миші - збільшуємо або зменшуємо на 0.3 за один scroll
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault()
     const delta = e.deltaY > 0 ? -0.3 : 0.3
     setZoom(z => {
       const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z + delta))
+      // При поверненні до 1x - скидаємо позицію
       if (next === MIN_ZOOM) setOffset({ x: 0, y: 0 })
       else setOffset(o => clampOffset(o.x, o.y, next))
       return next
     })
   }, [clampOffset])
 
-  // Double-click to toggle zoom
+  // Подвійний клік - переключає між 1x і 2x
   const handleDoubleClick = useCallback(() => {
     if (zoom > 1) {
       resetZoom()
@@ -81,7 +90,7 @@ function Lightbox({ urls, startIdx, onClose }: {
     }
   }, [zoom])
 
-  // Drag to pan
+  // Затиснути і тягти для панорамування (тільки коли є зум)
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (zoom <= 1) return
     e.preventDefault()
@@ -102,7 +111,7 @@ function Lightbox({ urls, startIdx, onClose }: {
     dragStart.current = null
   }, [])
 
-  // Touch support
+  // Touch-підтримка для мобільних (один палець - панорамування)
   const touchStart = useRef<{ tx: number; ty: number; ox: number; oy: number } | null>(null)
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (zoom <= 1 || e.touches.length !== 1) return
@@ -124,7 +133,8 @@ function Lightbox({ urls, startIdx, onClose }: {
     touchStart.current = null
   }, [])
 
-  // Keyboard navigation
+  // Клавіатурна навігація - стрілки і Esc
+  // Esc спочатку скидає зум, і тільки потім закриває лайтбокс
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft')  prev()
