@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Heart, ChevronLeft, ChevronRight, MapPin, Gauge, Fuel, Settings, Maximize2, X } from 'lucide-react'
+import { ArrowLeft, Heart, ChevronLeft, ChevronRight, ChevronDown, MapPin, Gauge, Fuel, Settings, Maximize2, X } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import OrderModal from '@/components/marketplace/OrderModal'
 import AuthPromptModal from '@/components/ui/AuthPromptModal'
@@ -269,6 +269,7 @@ export default function CarDetailPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [favorited, setFavorited] = useState(false)
   const [showOrder, setShowOrder] = useState(false)
+  const [descExpanded, setDescExpanded] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
@@ -469,12 +470,28 @@ export default function CarDetailPage() {
               ))}
             </div>
 
-            {listing.description && (
-              <div className="mb-8">
-                <p className="text-white/30 text-xs tracking-[0.25em] uppercase mb-3">Опис</p>
-                <p className="text-white/60 text-sm leading-relaxed whitespace-pre-line">{listing.description}</p>
-              </div>
-            )}
+            {listing.description && (() => {
+              const lines = listing.description.split('\n')
+              const isLong = lines.length > 3
+              const preview = lines.slice(0, 3).join('\n')
+              return (
+                <div className="mb-8">
+                  <p className="text-white/30 text-xs tracking-[0.25em] uppercase mb-3">Опис</p>
+                  <p className="text-white/60 text-sm leading-relaxed whitespace-pre-line">
+                    {descExpanded || !isLong ? listing.description : preview}
+                  </p>
+                  {isLong && !descExpanded && (
+                    <button
+                      onClick={() => setDescExpanded(true)}
+                      className="mt-2 flex items-center gap-1.5 text-white/40 hover:text-white/80 text-sm transition-colors"
+                    >
+                      <ChevronDown size={15} />
+                      Читати більше
+                    </button>
+                  )}
+                </div>
+              )
+            })()}
 
             <div className="mt-auto">
               <button
