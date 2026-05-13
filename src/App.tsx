@@ -10,6 +10,10 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import DiagnosticsPage from '@/pages/DiagnosticsPage'
 import DiagnosticsResultPage from '@/pages/DiagnosticsResultPage'
+import MarketplacePage from '@/pages/MarketplacePage'
+import CarDetailPage from '@/pages/CarDetailPage'
+import OrdersPage from '@/pages/OrdersPage'
+import AdminPage from '@/pages/admin/AdminPage'
 
 // Створюємо клієнт для кешування запитів до Supabase
 const queryClient = new QueryClient()
@@ -28,14 +32,10 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/diagnostics" element={<DiagnosticsPage />} />
             <Route path="/diagnostics/result" element={<DiagnosticsResultPage />} />
-
-            {/* TODO: захищені сторінки (тільки для авторизованих) */}
-            {/* <Route path="/garage" element={<ProtectedRoute><GaragePage /></ProtectedRoute>} /> */}
-            {/* <Route path="/diagnostics" element={<ProtectedRoute><DiagnosticsPage /></ProtectedRoute>} /> */}
-            {/* <Route path="/marketplace" element={<MarketplacePage />} /> */}
-
-            {/* TODO: адмін панель */}
-            {/* <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} /> */}
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/marketplace/:id" element={<CarDetailPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
