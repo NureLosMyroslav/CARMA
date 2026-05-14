@@ -1,9 +1,20 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { ChevronDown, ArrowRight, Lock } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import { useAuth } from '@/contexts/AuthContext'
 import type { CarInfo } from '@/lib/gemini'
+
+interface LocationState {
+  prefill?: {
+    make: string
+    model: string
+    year: number
+    mileage: number
+    fuelType: string
+    transmission: string
+  }
+}
 
 const CAR_MAKES = [
   'Acura', 'Alfa Romeo', 'Audi', 'BMW', 'Chevrolet', 'Citroën', 'Dacia',
@@ -49,16 +60,18 @@ function SelectField({
 }
 
 export default function DiagnosticsPage() {
-  const { user, profile, loading } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const prefill = (location.state as LocationState | null)?.prefill
 
   const [form, setForm] = useState({
-    make: '',
-    model: '',
-    year: 2020,
-    mileage: '',
-    fuelType: 'Бензин',
-    transmission: 'Механіка',
+    make: prefill?.make ?? '',
+    model: prefill?.model ?? '',
+    year: prefill?.year ?? 2020,
+    mileage: prefill ? String(prefill.mileage) : '',
+    fuelType: prefill?.fuelType ?? 'Бензин',
+    transmission: prefill?.transmission ?? 'Механіка',
   })
 
   const set =
