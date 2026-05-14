@@ -11,6 +11,7 @@ interface Profile {
   id: string
   full_name: string | null
   avatar_url: string | null
+  phone: string | null
   role: 'user' | 'admin'
   subscription_plan: 'free' | 'premium'
 }
@@ -36,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, role, subscription_plan')
+      .select('id, full_name, avatar_url, phone, role, subscription_plan')
       .eq('id', userId)
       .single()
 

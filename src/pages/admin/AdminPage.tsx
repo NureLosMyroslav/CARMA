@@ -208,7 +208,7 @@ export default function AdminPage() {
         {/* Вкладки навігації */}
         <div className="flex gap-1 mb-6 border-b border-white/8">
           {([
-            { key: 'listings', label: 'Оголошення', icon: <Car size={13} /> },
+            { key: 'listings', label: 'Оголошення', icon: <Car size={13} />, badge: 0 },
             { key: 'orders',   label: 'Заявки',     icon: <ClipboardList size={13} />, badge: pendingCount },
           ] as const).map(t => (
             <button
