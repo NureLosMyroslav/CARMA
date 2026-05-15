@@ -68,17 +68,23 @@ function Lightbox({ urls, startIdx, onClose }: {
     }
   }, [])
 
-  // Зум колесом миші - збільшуємо або зменшуємо на 0.3 за один scroll
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault()
-    const delta = e.deltaY > 0 ? -0.3 : 0.3
-    setZoom(z => {
-      const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z + delta))
-      // При поверненні до 1x - скидаємо позицію
-      if (next === MIN_ZOOM) setOffset({ x: 0, y: 0 })
-      else setOffset(o => clampOffset(o.x, o.y, next))
-      return next
-    })
+  // Зум колесом миші через нативний listener з passive:false
+  // (React onWheel не дозволяє preventDefault через пасивність браузера)
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const handler = (e: WheelEvent) => {
+      e.preventDefault()
+      const delta = e.deltaY > 0 ? -0.3 : 0.3
+      setZoom(z => {
+        const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z + delta))
+        if (next === MIN_ZOOM) setOffset({ x: 0, y: 0 })
+        else setOffset(o => clampOffset(o.x, o.y, next))
+        return next
+      })
+    }
+    el.addEventListener('wheel', handler, { passive: false })
+    return () => el.removeEventListener('wheel', handler)
   }, [clampOffset])
 
   // Подвійний клік - переключає між 1x і 2x
@@ -192,7 +198,6 @@ function Lightbox({ urls, startIdx, onClose }: {
         ref={containerRef}
         className="flex-1 relative flex items-center justify-center overflow-hidden"
         style={{ cursor: isZoomed ? (dragging ? 'grabbing' : 'grab') : 'zoom-in' }}
-        onWheel={handleWheel}
         onDoubleClick={handleDoubleClick}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
